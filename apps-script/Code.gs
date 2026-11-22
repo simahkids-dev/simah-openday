@@ -7,7 +7,7 @@ const CFG = {
   FOLDER_NAME: 'إيصالات اليوم المفتوح',
   CAP_PIZZA: 15,
   CAP_HOT: 10,
-  ALERT_EMAIL: 'simahkids@qafelah.org.sa',   // بريد يصله تنبيه تجاوز العدد
+  ALERT_EMAIL: 'simakids@qafelah.org.sa',   // بريد يصله تنبيه تجاوز العدد
   HOLD_MINUTES: 60
 };
 const HEAD = ['التاريخ', 'الرقم المرجعي', 'الحالة', 'اسم الطفل', 'العمر', 'الجنس', 'البيتزا', 'الهوت شوكلت',
