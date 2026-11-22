@@ -3,6 +3,7 @@
  * يُلصق في Google Apps Script مربوط بـ Google Sheet (Extensions ▸ Apps Script)
  */
 const CFG = {
+  SHEET_ID: '1vEIt9JFQKnUz0oTUurrS2V_M5RtX2h5V4-eztqa1AK4',
   SHEET: 'التسجيلات',
   FOLDER_NAME: 'إيصالات اليوم المفتوح',
   CAP_PIZZA: 15,
@@ -14,7 +15,7 @@ const HEAD = ['التاريخ', 'الرقم المرجعي', 'الحالة', 'ا
   'ولي الأمر', 'الجوال', 'جوال آخر', 'الحساسية', 'موافقة التصوير', 'مصدر المعرفة', 'كود الخصم', 'إجمالي الطلب', 'رابط الإيصال'];
 
 function sheet_() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = SpreadsheetApp.openById(CFG.SHEET_ID);
   let sh = ss.getSheetByName(CFG.SHEET);
   if (!sh) {
     sh = ss.insertSheet(CFG.SHEET);
@@ -84,7 +85,7 @@ function checkCapacity_(sh) {
   if (pz > CFG.CAP_PIZZA) msgs.push('ورشة البيتزا: ' + pz + ' من ' + CFG.CAP_PIZZA);
   if (ht > CFG.CAP_HOT) msgs.push('ورشة الهوت شوكلت: ' + ht + ' من ' + CFG.CAP_HOT);
   if (msgs.length && CFG.ALERT_EMAIL.indexOf('@') > 0) {
-    MailApp.sendEmail(CFG.ALERT_EMAIL, 'تنبيه سمة: تجاوز عدد التسجيل', 'تجاوز العدد المحدد:\n' + msgs.join('\n') + '\n\nراجعي الشيت: ' + SpreadsheetApp.getActiveSpreadsheet().getUrl());
+    MailApp.sendEmail(CFG.ALERT_EMAIL, 'تنبيه سمة: تجاوز عدد التسجيل', 'تجاوز العدد المحدد:\n' + msgs.join('\n') + '\n\nراجعي الشيت: ' + SpreadsheetApp.openById(CFG.SHEET_ID).getUrl());
   }
   props.setProperty('counts', JSON.stringify({ pz: pz, ht: ht }));
 }
