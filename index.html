@@ -364,7 +364,7 @@ async function send4() {
   } finally { $('b4').disabled = false; $('b4').textContent = 'تأكيد التسجيل'; }
 }
 /* ---- وضع المعاينة: يظهر قبل ربط الشيت أو بإضافة ?preview للرابط ---- */
-const PREVIEW = CONFIG.SCRIPT_URL.includes('PASTE') || /[?&]preview/.test(location.search);
+const PREVIEW = /[?&]preview/.test(location.search);
 function fillDemo() {
   const c = document.querySelector('.child');
   if (c && !c.querySelector('.kname').value) {
