@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>اليوم المفتوح في سمة · التسجيل في الورش</title>
+<meta name="description" content="سجّلوا طفلكم في ورشة البيتزا أو الهوت شوكلت في اليوم المفتوح بسمة للأطفال.">
+<link rel="icon" href="assets/logo.png">
+<style>
+/* ======== الإعدادات: عدّليها هنا فقط ======== */
+</style>
+<script>
+const CONFIG = {
+  // رابط Google Apps Script بعد النشر (انظري README)
+  SCRIPT_URL: "PASTE_APPS_SCRIPT_URL_HERE",
+  // بيانات الحساب البنكي — تُعبّأ قبل النشر
+  BANK_NAME: "مصرف الراجحي",
+  ACCOUNT_NAME: "جمعية قافلة الخير · حساب البرامج والفعاليات",
+  IBAN: "SA64 8000 0190 6080 1023 1611",
+  ACCOUNT_NO: "190608010231611",
+  PRICE: 50,                 // سعر الورشة الواحدة
+  CODE: "SIMAH50",           // كود خصم ٥٠٪ على إجمالي الطلب
+  HOLD_MINUTES: 60           // مدة حجز المقعد قبل رفع الإيصال
+};
+</script>
+<style>
+@font-face{font-family:TS;src:url(assets/thmanyahserifdisplay-Black.woff2) format("woff2");font-weight:900;font-display:swap}
+@font-face{font-family:TN;src:url(assets/thmanyahsans-Medium.woff2) format("woff2");font-weight:500;font-display:swap}
+@font-face{font-family:TN;src:url(assets/thmanyahsans-Bold.woff2) format("woff2");font-weight:700;font-display:swap}
+:root{--sage:#A8B187;--wood:#B88855;--rose:#C98D8A;--teal:#5A7C7A;--sand:#D1B07B;--ink:#3C352E;--cream:#F0E6D9;--rosed:#A6625E;--mut:#7d7369;--line:#e9e2d6;--bg:#f6f2ea}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--bg)}
+body{font-family:TN,system-ui,sans-serif;font-weight:500;color:var(--ink);line-height:1.7;min-height:100vh}
+.wrap{max-width:560px;margin:0 auto;padding:22px 16px 60px}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+header img{height:46px}
+.prog{display:flex;gap:6px;flex:1;max-width:180px}
+.prog i{flex:1;height:6px;border-radius:6px;background:var(--line)}
+.prog i.on{background:var(--sage)}
+.card{background:#fff;border-radius:22px;padding:24px 20px;box-shadow:0 8px 30px rgba(60,53,46,.07)}
+h1{font-family:TS;font-weight:900;font-size:30px;line-height:1.3}
+h2{font-family:TS;font-weight:900;font-size:22px;margin-bottom:4px}
+.sub{color:var(--mut);font-size:15px}
+.mk{background:linear-gradient(transparent 55%,rgba(168,177,135,.55) 55% 92%,transparent 92%);padding:0 4px}
+.when{display:flex;gap:10px;margin:16px 0}
+.when div{flex:1;background:var(--cream);border-radius:14px;padding:10px 12px;text-align:center}
+.when b{display:block;font-family:TS;font-size:18px}
+.when span{font-size:13px;color:var(--mut)}
+.ws{display:flex;gap:12px;margin:12px 0}
+.ws>div{flex:1;border:1.5px solid var(--line);border-radius:16px;padding:14px;position:relative}
+.ws .em{font-size:28px}
+.ws h3{font-family:TS;font-size:18px;margin:4px 0}
+.ws p{font-size:13.5px;color:var(--mut);line-height:1.6}
+.ws .price{display:inline-block;margin-top:8px;background:var(--ink);color:#fff;border-radius:20px;padding:2px 12px;font-size:13px;font-weight:700}
+.free{background:#f3f5ec;border-radius:16px;padding:14px 16px;margin:12px 0}
+.free h3{font-size:15px;color:var(--teal);margin-bottom:4px}
+.free ul{list-style:none;display:flex;flex-wrap:wrap;gap:6px}
+.free li{background:#fff;border-radius:20px;padding:3px 12px;font-size:13.5px}
+.moms{background:#fbeeed;border-radius:16px;padding:14px 16px;font-size:14.5px;margin:12px 0}
+label{display:block;font-weight:700;font-size:14.5px;margin:14px 0 6px}
+label small{font-weight:500;color:var(--mut)}
+input[type=text],input[type=tel],textarea{width:100%;font:inherit;font-size:16px;border:1.5px solid var(--line);border-radius:12px;padding:11px 14px;background:#fff;color:var(--ink)}
+input:focus,textarea:focus{outline:none;border-color:var(--sage);box-shadow:0 0 0 3px rgba(168,177,135,.25)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips label{margin:0;font-weight:500;cursor:pointer}
+.chips input{display:none}
+.chips span{display:inline-block;border:1.5px solid var(--line);border-radius:24px;padding:7px 16px;font-size:15px;background:#fff}
+.chips input:checked+span{background:var(--sage);border-color:var(--sage);color:#fff;font-weight:700}
+.child{border:1.5px dashed var(--line);border-radius:16px;padding:6px 14px 14px;margin-top:12px;position:relative}
+.child .rm{position:absolute;left:10px;top:10px;border:0;background:none;color:var(--rosed);font:inherit;font-size:13px;cursor:pointer}
+.child h4{font-family:TS;font-size:16px;margin-top:8px}
+.btn{display:block;width:100%;border:0;border-radius:16px;padding:14px;font:inherit;font-size:17px;font-weight:700;cursor:pointer;margin-top:20px;background:var(--teal);color:#fff}
+.btn:disabled{opacity:.55;cursor:wait}
+.btn.o{background:#fff;color:var(--teal);border:1.5px solid var(--teal);margin-top:10px;font-size:15px;padding:10px}
+.back{background:none;border:0;color:var(--mut);font:inherit;font-size:14px;cursor:pointer;margin-top:12px;display:block;margin-inline:auto}
+.sum{background:var(--cream);border-radius:16px;padding:14px 16px;margin:12px 0;font-size:15px}
+.sum .row{display:flex;justify-content:space-between;gap:8px;padding:3px 0}
+.sum .tot{border-top:1.5px solid #e2d5c2;margin-top:6px;padding-top:8px;font-family:TS;font-size:20px}
+.bank{border:1.5px solid var(--line);border-radius:16px;padding:12px 16px;margin:12px 0}
+.bank .row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--line);font-size:14.5px}
+.bank .row:last-child{border:0}
+.bank code{font-family:TN;font-weight:700;direction:ltr;unicode-bidi:embed}
+.cp{border:0;background:var(--cream);border-radius:10px;padding:4px 10px;font:inherit;font-size:13px;cursor:pointer}
+.timer{background:#fbf3e3;border-radius:14px;padding:10px 14px;text-align:center;font-size:14.5px}
+.timer b{font-family:TS;font-size:20px;color:var(--wood);direction:ltr;display:inline-block}
+.drop{border:2px dashed var(--sage);border-radius:16px;padding:18px;text-align:center;cursor:pointer;background:#fafbf6;margin-top:6px}
+.drop.has{border-style:solid;background:#f3f5ec}
+.err{color:var(--rosed);font-size:14px;margin-top:10px;min-height:1em}
+.note{font-size:13px;color:var(--mut);margin-top:6px}
+.code-ok{color:var(--teal);font-size:13.5px;font-weight:700}
+.done{text-align:center;padding:16px 0}
+.done .big{font-size:56px}
+.ref{display:inline-block;background:var(--cream);border-radius:12px;padding:6px 16px;font-family:TS;font-size:20px;letter-spacing:.05em;margin:10px 0;direction:ltr}
+.hide{display:none}
+footer{text-align:center;color:#a99f93;font-size:12.5px;margin-top:20px}
+@media(max-width:420px){.ws{flex-direction:column}h1{font-size:26px}}
+.ticker{position:sticky;top:0;z-index:20;background:var(--rosed);color:#fff;overflow:hidden;white-space:nowrap;font-weight:700;font-size:15px;padding:9px 0}
+.ticker .tr{display:inline-flex;animation:tk 26s linear infinite}
+.ticker .tr span{padding:0 28px}
+.ticker b{background:#fff;color:var(--rosed);border-radius:8px;padding:1px 10px;margin:0 6px;letter-spacing:.06em;direction:ltr;display:inline-block}
+@keyframes tk{from{transform:translateX(0)}to{transform:translateX(50%)}}
+.hero{position:relative;overflow:hidden;border-radius:26px;padding:30px 22px 26px;color:#fff;background:linear-gradient(150deg,#5A7C7A 0%,#7a9a8d 45%,#A8B187 100%);margin-bottom:14px;box-shadow:0 14px 34px rgba(90,124,122,.3)}
+.hero h1{color:#fff;font-size:38px;line-height:1.2}
+.hero h1 span{color:#F0E6D9;background:none}
+.hero p{color:#eef2e6;font-size:16px;margin-top:6px}
+.hero .fl{position:absolute;font-size:34px;animation:bob 3.4s ease-in-out infinite}
+.hero .bub{position:absolute;border-radius:50%;opacity:.22;background:#fff}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-6deg)}50%{transform:translateY(-10px) rotate(6deg)}}
+.pill{display:inline-flex;gap:6px;align-items:center;background:#fff;color:var(--ink);border-radius:30px;padding:6px 14px;font-weight:700;font-size:14px;margin-top:14px;margin-left:6px}
+.ws>div{transition:transform .2s}
+.ws>div:hover{transform:translateY(-3px) rotate(-1deg)}
+.ws .pz{background:#fbf3ea;border-color:#f0dfc6}
+.ws .hc{background:#fbeeed;border-color:#f0dad8}
+.ws .em{font-size:40px;display:inline-block;animation:bob 3s ease-in-out infinite}
+.btn.go{background:linear-gradient(90deg,var(--rosed),var(--rose));font-size:19px;box-shadow:0 10px 22px rgba(166,98,94,.35);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
+.coupon{border:2px dashed var(--rosed);border-radius:16px;padding:12px 16px;margin:12px 0;background:#fff;text-align:center;font-size:15px}
+.coupon b{font-family:TS;font-size:22px;color:var(--rosed);letter-spacing:.08em;direction:ltr;display:inline-block}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+.pv{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);z-index:50;background:var(--ink);color:#fff;border-radius:30px;padding:6px 8px;display:flex;gap:4px;align-items:center;font-size:13px;box-shadow:0 8px 20px rgba(0,0,0,.25)}
+.pv span{padding:0 8px;opacity:.8}
+.pv button{border:0;border-radius:20px;width:32px;height:32px;font:inherit;font-weight:700;cursor:pointer;background:#fff;color:var(--ink)}
+.pv button.on{background:var(--sage);color:#fff}
+</style>
+</head>
+<body>
+<div class="ticker"><div class="tr"><span>🍕 خصم ٥٠٪ على الورش لحاملي كوبون عربة سمة · استخدموا الكود <b>SIMAH50</b> عند التسجيل 🎉 · المقاعد محدودة · الخميس الساعة ١٠ صباحاً · ألعاب مجانية لكل العائلة 🎈</span><span>🍕 خصم ٥٠٪ على الورش لحاملي كوبون عربة سمة · استخدموا الكود <b>SIMAH50</b> عند التسجيل 🎉 · المقاعد محدودة · الخميس الساعة ١٠ صباحاً · ألعاب مجانية لكل العائلة 🎈</span></div></div>
+<div class="wrap">
+  <header><img src="assets/logo.png" alt="سمة للأطفال"><div class="prog" id="prog"><i></i><i></i><i></i><i></i><i></i></div></header>
+
+  <!-- 1 WELCOME -->
+  <section class="card step" data-s="1">
+    <div class="hero">
+      <span class="bub" style="width:160px;height:160px;left:-50px;top:-60px"></span>
+      <span class="bub" style="width:90px;height:90px;left:60px;bottom:-40px"></span>
+      <span class="fl" style="left:18px;top:22px">🎈</span>
+      <span class="fl" style="left:80px;top:70px;animation-delay:.6s">🍕</span>
+      <span class="fl" style="left:26px;top:120px;animation-delay:1.2s">☕</span>
+      <h1>اليوم المفتوح<br>في <span>سمة</span> 🎉</h1>
+      <p>صباح مليان طبخ ولعب وضحك… وتعالوا تعرّفوا علينا!</p>
+      <span class="pill">📅 الخميس</span><span class="pill">⏰ ١٠ صباحاً</span>
+    </div>
+    
+    <div class="ws">
+      <div class="pz"><span class="em">🍕</span><h3>ورشة البيتزا</h3><p>يشكّل الطفل بيتزته ويزيّنها بنفسه، ويأخذ صحنه المطبوع بشعار سمة للبيت.</p><span class="price">٥٠ ريال</span></div>
+      <div class="hc"><span class="em" style="animation-delay:.8s">☕</span><h3>ورشة الهوت شوكلت</h3><p>يحضّر مشروبه ويزيّنه، ويأخذ كوبه المطبوع بشعار سمة للبيت.</p><span class="price">٥٠ ريال</span></div>
+    </div>
+    <div class="free">
+      <h3>مجاناً لكل العائلة 🎈</h3>
+      <ul><li>🏃 الماراثون</li><li>🛝 الزحليقة والرمل</li><li>⚽ ألعاب ومسابقات حركية</li><li>☕ ضيافة الأمهات</li></ul>
+    </div>
+    <div class="moms">💛 حضور الأهل مو شرط، لكن نتمنى نشوفكم! تعالوا شوفوا طفلكم وهو يطبخ، وتعرّفوا على فريق سمة. وإذا عندكم أطفال بأعمار ثانية، جيبوهم يلعبون معنا في الألعاب المجانية.</div>
+    <div class="coupon">عندكم كوبون من عربة سمة؟ 🎟️<br>استخدموا الكود <b>SIMAH50</b> وخذوا خصم ٥٠٪ على إجمالي التسجيل</div>
+    <p class="note">الورش للأطفال من ٣ إلى ٦ سنوات · ١٦ جمادى الآخرة ١٤٤٨هـ</p>
+    <button class="btn go" onclick="go(2)">سجّلوا الآن 🚀</button>
+  </section>
+
+  <!-- 2 CHILDREN + WORKSHOPS -->
+  <section class="card step hide" data-s="2">
+    <h2>بيانات الطفل والورشة</h2>
+    <p class="sub">تقدرون تسجّلون أكثر من طفل في نفس الطلب.</p>
+    <div id="kids"></div>
+    <button class="btn o" type="button" onclick="addKid()">+ إضافة طفل آخر</button>
+    <label>كود الخصم <small>(اختياري)</small></label>
+    <input type="text" id="code" placeholder="مثال: SIMAH50" autocomplete="off" oninput="checkCode()">
+    <div id="codeMsg" class="note"></div>
+    <div class="sum" id="sum2"></div>
+    <div class="err" id="err2"></div>
+    <button class="btn" onclick="next2()">التالي</button>
+    <button class="back" onclick="go(1)">→ رجوع</button>
+  </section>
+
+  <!-- 3 PARENT + SAFETY -->
+  <section class="card step hide" data-s="3">
+    <h2>ولي الأمر والسلامة</h2>
+    <label>اسم ولي الأمر</label>
+    <input type="text" id="pname" autocomplete="name">
+    <label>رقم الجوال</label>
+    <input type="tel" id="phone1" placeholder="05xxxxxxxx" inputmode="numeric" autocomplete="tel">
+    <label>رقم جوال آخر <small>(اختياري)</small></label>
+    <input type="tel" id="phone2" placeholder="05xxxxxxxx" inputmode="numeric">
+    <label>هل عند الطفل أي حساسية؟</label>
+    <div class="chips">
+      <label><input type="radio" name="alg" value="لا يوجد" onchange="algT()"><span>لا يوجد</span></label>
+      <label><input type="radio" name="alg" value="يوجد" onchange="algT()"><span>يوجد</span></label>
+    </div>
+    <div id="algBox" class="hide"><label>نوع الحساسية <small>(في الورش: قمح، جبن، حليب، كاكاو)</small></label><textarea id="algTxt" rows="2"></textarea></div>
+    <label>نوافق على تصوير الطفل للنشر في حسابات سمة</label>
+    <div class="chips">
+      <label><input type="radio" name="photo" value="نعم"><span>نعم</span></label>
+      <label><input type="radio" name="photo" value="لا"><span>لا</span></label>
+    </div>
+    <label>من وين عرفتوا عن اليوم المفتوح؟</label>
+    <div class="chips">
+      <label><input type="radio" name="src" value="سمة للأطفال"><span>سمة للأطفال</span></label>
+      <label><input type="radio" name="src" value="عربة سمة"><span>عربة سمة</span></label>
+      <label><input type="radio" name="src" value="إنستقرام"><span>إنستقرام</span></label>
+      <label><input type="radio" name="src" value="سناب"><span>سناب</span></label>
+      <label><input type="radio" name="src" value="صديقة/قريبة"><span>صديقة أو قريبة</span></label>
+      <label><input type="radio" name="src" value="غير ذلك"><span>غير ذلك</span></label>
+    </div>
+    <div class="err" id="err3"></div>
+    <button class="btn" id="b3" onclick="next3()">التالي: الدفع</button>
+    <button class="back" onclick="go(2)">→ رجوع</button>
+  </section>
+
+  <!-- 4 PAYMENT -->
+  <section class="card step hide" data-s="4">
+    <h2>التحويل وتأكيد الحجز</h2>
+    <div class="sum" id="sum4"></div>
+    <div class="timer">⏳ مقعدكم محجوز لمدة <b id="clock">60:00</b><br>ارفعوا إيصال التحويل قبل انتهاء الوقت لتأكيد التسجيل.</div>
+    <div class="bank">
+      <div class="row"><span>البنك</span><code id="bName"></code></div>
+      <div class="row"><span>اسم الحساب</span><code id="aName"></code></div>
+      <div class="row"><span>رقم الحساب</span><span><code id="accNo"></code> <button class="cp" onclick="copyTxt(CONFIG.ACCOUNT_NO)">نسخ</button></span></div>
+      <div class="row"><span>الآيبان</span><span><code id="iban"></code> <button class="cp" onclick="copyIban()">نسخ</button></span></div>
+    </div>
+    <label>إيصال التحويل <small>(صورة أو PDF)</small></label>
+    <div class="drop" id="drop" onclick="document.getElementById('file').click()">📎 اضغطوا لاختيار الإيصال</div>
+    <input type="file" id="file" accept="image/*,application/pdf" class="hide" onchange="pick(this)">
+    <div class="err" id="err4"></div>
+    <button class="btn" id="b4" onclick="send4()">تأكيد التسجيل</button>
+  </section>
+
+  <!-- 5 THANKS -->
+  <section class="card step hide" data-s="5">
+    <div class="done">
+      <div class="big">🎉</div>
+      <h2>شكراً لكم!</h2>
+      <p class="sub">وصلنا تسجيلكم وإيصال التحويل، وبيتواصل معكم فريق سمة لتأكيد الحجز.</p>
+      <div>رقمكم المرجعي</div>
+      <div class="ref" id="refOut"></div>
+      <p class="sub">نشوفكم الخميس الساعة ١٠ صباحاً 💛</p>
+    </div>
+  </section>
+
+  <footer>سمة للأطفال · الدمام · حي الشاطئ</footer>
+</div>
+
+<script>
+const AR = n => String(n).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
+let step = 1, ref = '', deadline = 0, tick = null, fileData = null;
+const $ = id => document.getElementById(id);
+
+function go(s) {
+  document.querySelectorAll('.step').forEach(e => e.classList.toggle('hide', +e.dataset.s !== s));
+  document.querySelectorAll('#prog i').forEach((e, i) => e.classList.toggle('on', i < s));
+  step = s; window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ---- children ---- */
+let kidN = 0;
+function addKid() {
+  kidN++;
+  const d = document.createElement('div'); d.className = 'child'; d.dataset.k = kidN;
+  d.innerHTML = `${document.querySelectorAll('.child').length ? '<button class="rm" type="button" onclick="this.parentNode.remove();calc()">حذف</button>' : ''}
+    <h4>الطفل ${AR(document.querySelectorAll('.child').length + 1)}</h4>
+    <label>اسم الطفل الثلاثي</label><input type="text" class="kname">
+    <label>العمر</label><div class="chips">${[3,4,5,6].map(a => `<label><input type="radio" name="age${kidN}" value="${a}"><span>${AR(a)} سنوات</span></label>`).join('')}</div>
+    <label>الجنس</label><div class="chips"><label><input type="radio" name="sex${kidN}" value="ولد"><span>ولد</span></label><label><input type="radio" name="sex${kidN}" value="بنت"><span>بنت</span></label></div>
+    <label>الورشة</label><div class="chips"><label><input type="checkbox" class="wp" onchange="calc()"><span>🍕 البيتزا</span></label><label><input type="checkbox" class="wh" onchange="calc()"><span>☕ الهوت شوكلت</span></label></div>`;
+  $('kids').appendChild(d); calc();
+}
+function kids() {
+  return [...document.querySelectorAll('.child')].map(c => ({
+    name: c.querySelector('.kname').value.trim(),
+    age: (c.querySelector(`input[name^=age]:checked`) || {}).value || '',
+    sex: (c.querySelector(`input[name^=sex]:checked`) || {}).value || '',
+    pizza: c.querySelector('.wp').checked, hot: c.querySelector('.wh').checked
+  }));
+}
+function codeOk() { return $('code').value.trim().toUpperCase() === CONFIG.CODE; }
+function checkCode() {
+  const v = $('code').value.trim();
+  $('codeMsg').innerHTML = !v ? '' : codeOk() ? '<span class="code-ok">✓ تم تطبيق خصم ٥٠٪ على الإجمالي</span>' : 'الكود غير صحيح';
+  calc();
+}
+function total() {
+  const ks = kids(); let t = 0, lines = [];
+  ks.forEach((k, i) => {
+    const w = []; if (k.pizza) w.push('البيتزا'); if (k.hot) w.push('الهوت شوكلت');
+    if (w.length) { t += w.length * CONFIG.PRICE; lines.push([(k.name || 'الطفل ' + AR(i + 1)) + ' · ' + w.join(' + '), w.length * CONFIG.PRICE]); }
+  });
+  let disc = 0;
+  if (codeOk()) disc = t / 2;
+  return { t: t - disc, lines, disc };
+}
+function sumHtml() {
+  const { t, lines, disc } = total();
+  if (!lines.length) return '<span class="note">اختاروا ورشة واحدة على الأقل.</span>';
+  return lines.map(l => `<div class="row"><span>${l[0]}</span><span>${AR(l[1])} ر.س</span></div>`).join('') +
+    (disc ? `<div class="row"><span>خصم ${CONFIG.CODE}</span><span>−${AR(disc)} ر.س</span></div>` : '') +
+    `<div class="row tot"><span>الإجمالي</span><span>${AR(t)} ر.س</span></div>`;
+}
+function calc() { $('sum2').innerHTML = sumHtml(); }
+
+function next2() {
+  const ks = kids(); $('err2').textContent = '';
+  for (const [i, k] of ks.entries()) {
+    if (!k.name || !k.age || !k.sex) return $('err2').textContent = `أكملوا بيانات الطفل ${AR(i + 1)}: الاسم والعمر والجنس.`;
+    if (!k.pizza && !k.hot) return $('err2').textContent = `اختاروا ورشة للطفل ${AR(i + 1)}.`;
+  }
+  go(3);
+}
+function algT() { $('algBox').classList.toggle('hide', (document.querySelector('input[name=alg]:checked') || {}).value !== 'يوجد'); }
+const radio = n => (document.querySelector(`input[name=${n}]:checked`) || {}).value || '';
+const phoneOk = p => /^05\d{8}$/.test(p.replace(/\s/g, '').replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)));
+const normPhone = p => p.replace(/\s/g, '').replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
+
+async function post(payload) {
+  const r = await fetch(CONFIG.SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) });
+  return r.json();
+}
+
+async function next3() {
+  $('err3').textContent = '';
+  if (!$('pname').value.trim()) return $('err3').textContent = 'اكتبوا اسم ولي الأمر.';
+  if (!phoneOk($('phone1').value)) return $('err3').textContent = 'رقم الجوال يبدأ بـ05 ومكوّن من ١٠ أرقام.';
+  if ($('phone2').value.trim() && !phoneOk($('phone2').value)) return $('err3').textContent = 'الرقم الثاني غير صحيح.';
+  if (!radio('alg')) return $('err3').textContent = 'اختاروا: هل عند الطفل حساسية؟';
+  if (radio('alg') === 'يوجد' && !$('algTxt').value.trim()) return $('err3').textContent = 'اكتبوا نوع الحساسية.';
+  if (!radio('photo')) return $('err3').textContent = 'اختاروا موافقة التصوير.';
+  const { t } = total();
+  $('b3').disabled = true; $('b3').textContent = 'جاري الحجز…';
+  try {
+    const res = await post({
+      action: 'register', kids: kids(), code: codeOk() ? CONFIG.CODE : ($('code').value.trim() || ''),
+      parent: $('pname').value.trim(), phone1: normPhone($('phone1').value), phone2: normPhone($('phone2').value),
+      allergy: radio('alg') === 'يوجد' ? $('algTxt').value.trim() : 'لا يوجد', photo: radio('photo'), source: radio('src'), total: t
+    });
+    if (!res.ok) throw new Error(res.error || 'err');
+    ref = res.ref;
+    $('sum4').innerHTML = sumHtml();
+    $('bName').textContent = CONFIG.BANK_NAME; $('aName').textContent = CONFIG.ACCOUNT_NAME; $('iban').textContent = CONFIG.IBAN; $('accNo').textContent = CONFIG.ACCOUNT_NO;
+    deadline = Date.now() + CONFIG.HOLD_MINUTES * 60000; clearInterval(tick); tick = setInterval(clock, 1000); clock();
+    go(4);
+  } catch (e) {
+    $('err3').textContent = 'تعذّر الإرسال، تأكدوا من الاتصال وحاولوا مرة ثانية.';
+  } finally { $('b3').disabled = false; $('b3').textContent = 'التالي: الدفع'; }
+}
+function clock() {
+  const s = Math.max(0, Math.round((deadline - Date.now()) / 1000));
+  $('clock').textContent = String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
+  if (!s) { clearInterval(tick); $('err4').textContent = 'انتهى وقت الحجز. تقدرون ترفعون الإيصال الآن، ونتأكد من توفر المقعد ونتواصل معكم.'; }
+}
+function copyTxt(t) { navigator.clipboard && navigator.clipboard.writeText(t.replace(/\s/g, '')); event.target.textContent = 'تم ✓'; }
+function copyIban() { copyTxt(CONFIG.IBAN); }
+function pick(inp) {
+  const f = inp.files[0]; if (!f) return;
+  if (f.size > 8 * 1024 * 1024) { $('err4').textContent = 'الملف أكبر من ٨ ميجا.'; return; }
+  const rd = new FileReader();
+  rd.onload = () => { fileData = { name: f.name, type: f.type, data: rd.result.split(',')[1] }; $('drop').classList.add('has'); $('drop').textContent = '✓ ' + f.name; $('err4').textContent = ''; };
+  rd.readAsDataURL(f);
+}
+async function send4() {
+  if (!fileData) return $('err4').textContent = 'ارفعوا إيصال التحويل.';
+  $('b4').disabled = true; $('b4').textContent = 'جاري الرفع…';
+  try {
+    const res = await post({ action: 'receipt', ref, file: fileData });
+    if (!res.ok) throw new Error(res.error || 'err');
+    clearInterval(tick); $('refOut').textContent = ref; go(5);
+  } catch (e) {
+    $('err4').textContent = 'تعذّر رفع الإيصال، حاولوا مرة ثانية.';
+  } finally { $('b4').disabled = false; $('b4').textContent = 'تأكيد التسجيل'; }
+}
+/* ---- وضع المعاينة: يظهر قبل ربط الشيت أو بإضافة ?preview للرابط ---- */
+const PREVIEW = CONFIG.SCRIPT_URL.includes('PASTE') || /[?&]preview/.test(location.search);
+function fillDemo() {
+  const c = document.querySelector('.child');
+  if (c && !c.querySelector('.kname').value) {
+    c.querySelector('.kname').value = 'اسم تجريبي';
+    c.querySelector('input[name^=age]').checked = true;
+    c.querySelector('input[name^=sex]').checked = true;
+    c.querySelector('.wp').checked = true; calc();
+  }
+  $('sum4').innerHTML = sumHtml();
+  $('bName').textContent = CONFIG.BANK_NAME; $('aName').textContent = CONFIG.ACCOUNT_NAME;
+  $('iban').textContent = CONFIG.IBAN; $('accNo').textContent = CONFIG.ACCOUNT_NO;
+  $('refOut').textContent = 'SM-000000-000';
+  if (!deadline) { deadline = Date.now() + CONFIG.HOLD_MINUTES * 60000; tick = setInterval(clock, 1000); clock(); }
+}
+if (PREVIEW) {
+  const bar = document.createElement('div'); bar.className = 'pv';
+  bar.innerHTML = '<span>معاينة</span>' + [1,2,3,4,5].map(n => `<button onclick="fillDemo();go(${n})">${AR(n)}</button>`).join('');
+  document.body.appendChild(bar);
+  const _go = go; go = n => { _go(n); bar.querySelectorAll('button').forEach((b, i) => b.classList.toggle('on', i + 1 === n)); };
+}
+addKid(); go(1);
+</script>
+</body>
+</html>
