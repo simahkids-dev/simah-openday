@@ -363,28 +363,6 @@ async function send4() {
     $('err4').textContent = 'تعذّر رفع الإيصال، حاولوا مرة ثانية.';
   } finally { $('b4').disabled = false; $('b4').textContent = 'تأكيد التسجيل'; }
 }
-/* ---- وضع المعاينة: يظهر قبل ربط الشيت أو بإضافة ?preview للرابط ---- */
-const PREVIEW = /[?&]preview/.test(location.search);
-function fillDemo() {
-  const c = document.querySelector('.child');
-  if (c && !c.querySelector('.kname').value) {
-    c.querySelector('.kname').value = 'اسم تجريبي';
-    c.querySelector('input[name^=age]').checked = true;
-    c.querySelector('input[name^=sex]').checked = true;
-    c.querySelector('.wp').checked = true; calc();
-  }
-  $('sum4').innerHTML = sumHtml();
-  $('bName').textContent = CONFIG.BANK_NAME; $('aName').textContent = CONFIG.ACCOUNT_NAME;
-  $('iban').textContent = CONFIG.IBAN; $('accNo').textContent = CONFIG.ACCOUNT_NO;
-  $('refOut').textContent = 'SM-000000-000';
-  if (!deadline) { deadline = Date.now() + CONFIG.HOLD_MINUTES * 60000; tick = setInterval(clock, 1000); clock(); }
-}
-if (PREVIEW) {
-  const bar = document.createElement('div'); bar.className = 'pv';
-  bar.innerHTML = '<span>معاينة</span>' + [1,2,3,4,5].map(n => `<button onclick="fillDemo();go(${n})">${AR(n)}</button>`).join('');
-  document.body.appendChild(bar);
-  const _go = go; go = n => { _go(n); bar.querySelectorAll('button').forEach((b, i) => b.classList.toggle('on', i + 1 === n)); };
-}
 addKid(); go(1);
 </script>
 </body>
