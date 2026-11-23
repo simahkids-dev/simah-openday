@@ -321,22 +321,25 @@ async function next3() {
   if (radio('alg') === 'يوجد' && !$('algTxt').value.trim()) return $('err3').textContent = 'اكتبوا نوع الحساسية.';
   if (!radio('photo')) return $('err3').textContent = 'اختاروا موافقة التصوير.';
   const { t } = total();
-  $('b3').disabled = true; $('b3').textContent = 'جاري الحجز…';
-  try {
-    const res = await post({
-      action: 'register', kids: kids(), code: codeOk() ? CONFIG.CODE : ($('code').value.trim() || ''),
-      parent: $('pname').value.trim(), phone1: normPhone($('phone1').value), phone2: normPhone($('phone2').value),
-      allergy: radio('alg') === 'يوجد' ? $('algTxt').value.trim() : 'لا يوجد', photo: radio('photo'), source: radio('src'), total: t
-    });
-    if (!res.ok) throw new Error(res.error || 'err');
-    ref = res.ref;
-    $('sum4').innerHTML = sumHtml();
-    $('bName').textContent = CONFIG.BANK_NAME; $('aName').textContent = CONFIG.ACCOUNT_NAME; $('iban').textContent = CONFIG.IBAN; $('accNo').textContent = CONFIG.ACCOUNT_NO;
-    deadline = Date.now() + CONFIG.HOLD_MINUTES * 60000; clearInterval(tick); tick = setInterval(clock, 1000); clock();
-    go(4);
-  } catch (e) {
-    $('err3').textContent = 'تعذّر الإرسال، تأكدوا من الاتصال وحاولوا مرة ثانية.';
-  } finally { $('b3').disabled = false; $('b3').textContent = 'التالي: الدفع'; }
+  const payload = {
+    action: 'register', kids: kids(), code: codeOk() ? CONFIG.CODE : ($('code').value.trim() || ''),
+    parent: $('pname').value.trim(), phone1: normPhone($('phone1').value), phone2: normPhone($('phone2').value),
+    allergy: radio('alg') === 'يوجد' ? $('algTxt').value.trim() : 'لا يوجد', photo: radio('photo'), source: radio('src'), total: t
+  };
+  // الحجز يُرسل في الخلفية، وصفحة الدفع تظهر فوراً
+  if (!regP || JSON.stringify(payload) !== JSON.stringify(lastPayload)) { ref = ''; regP = register(payload); }
+  lastPayload = payload;
+  $('sum4').innerHTML = sumHtml();
+  $('bName').textContent = CONFIG.BANK_NAME; $('aName').textContent = CONFIG.ACCOUNT_NAME; $('iban').textContent = CONFIG.IBAN; $('accNo').textContent = CONFIG.ACCOUNT_NO;
+  deadline = Date.now() + CONFIG.HOLD_MINUTES * 60000; clearInterval(tick); tick = setInterval(clock, 1000); clock();
+  go(4);
+}
+let regP = null, lastPayload = null;
+async function register(payload) {
+  for (let i = 0; i < 3; i++) {
+    try { const res = await post(payload); if (res.ok) { ref = res.ref; return ref; } } catch (e) {}
+  }
+  regP = null; throw new Error('register');
 }
 function clock() {
   const s = Math.max(0, Math.round((deadline - Date.now()) / 1000));
@@ -347,15 +350,29 @@ function copyTxt(t) { navigator.clipboard && navigator.clipboard.writeText(t.rep
 function copyIban() { copyTxt(CONFIG.IBAN); }
 function pick(inp) {
   const f = inp.files[0]; if (!f) return;
-  if (f.size > 8 * 1024 * 1024) { $('err4').textContent = 'الملف أكبر من ٨ ميجا.'; return; }
+  if (f.size > 15 * 1024 * 1024) { $('err4').textContent = 'الملف كبير جداً.'; return; }
+  const done = (name, type, data) => { fileData = { name, type, data }; $('drop').classList.add('has'); $('drop').textContent = '✓ ' + f.name; $('err4').textContent = ''; };
   const rd = new FileReader();
-  rd.onload = () => { fileData = { name: f.name, type: f.type, data: rd.result.split(',')[1] }; $('drop').classList.add('has'); $('drop').textContent = '✓ ' + f.name; $('err4').textContent = ''; };
+  rd.onload = () => {
+    if (!/^image\//.test(f.type) || /gif|svg/.test(f.type)) return done(f.name, f.type, rd.result.split(',')[1]);
+    // تصغير صورة الإيصال قبل الرفع لتسريعه
+    const img = new Image();
+    img.onload = () => {
+      const k = Math.min(1, 1600 / Math.max(img.width, img.height)), c = document.createElement('canvas');
+      c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      done(f.name.replace(/\.\w+$/, '') + '.jpg', 'image/jpeg', c.toDataURL('image/jpeg', 0.82).split(',')[1]);
+    };
+    img.onerror = () => done(f.name, f.type, rd.result.split(',')[1]);
+    img.src = rd.result;
+  };
   rd.readAsDataURL(f);
 }
 async function send4() {
   if (!fileData) return $('err4').textContent = 'ارفعوا إيصال التحويل.';
   $('b4').disabled = true; $('b4').textContent = 'جاري الرفع…';
   try {
+    if (!ref) await (regP || (regP = register(lastPayload)));
     const res = await post({ action: 'receipt', ref, file: fileData });
     if (!res.ok) throw new Error(res.error || 'err');
     clearInterval(tick); $('refOut').textContent = ref; go(5);
