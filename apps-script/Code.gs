@@ -29,15 +29,24 @@ function out_(o) { return ContentService.createTextOutput(JSON.stringify(o)).set
 function doGet() { return out_({ ok: true, msg: 'Simah open day endpoint' }); }
 
 function doPost(e) {
-  const lock = LockService.getScriptLock(); lock.waitLock(20000);
+  let lock = null;
   try {
     const p = JSON.parse(e.postData.contents);
-    if (p.action === 'register') return out_(register_(p));
-    if (p.action === 'receipt') return out_(receipt_(p));
+    if (p.action === 'ping') return out_({ ok: true });
+    if (p.action === 'receipt') return out_(receipt_(p));   // بدون قفل: أسرع
+    if (p.action === 'register') { lock = LockService.getScriptLock(); lock.waitLock(20000); return out_(register_(p)); }
     return out_({ ok: false, error: 'unknown action' });
   } catch (err) {
     return out_({ ok: false, error: String(err) });
-  } finally { lock.releaseLock(); }
+  } finally { if (lock) lock.releaseLock(); }
+}
+
+function folder_() {
+  const props = PropertiesService.getScriptProperties(), id = props.getProperty('folderId');
+  if (id) { try { return DriveApp.getFolderById(id); } catch (e) {} }
+  const it = DriveApp.getFoldersByName(CFG.FOLDER_NAME);
+  const f = it.hasNext() ? it.next() : DriveApp.createFolder(CFG.FOLDER_NAME);
+  props.setProperty('folderId', f.getId()); return f;
 }
 
 function register_(p) {
@@ -55,14 +64,11 @@ function register_(p) {
 
 function receipt_(p) {
   const sh = sheet_();
-  const it = DriveApp.getFoldersByName(CFG.FOLDER_NAME);
-  const folder = it.hasNext() ? it.next() : DriveApp.createFolder(CFG.FOLDER_NAME);
   const blob = Utilities.newBlob(Utilities.base64Decode(p.file.data), p.file.type, p.ref + ' - ' + p.file.name);
-  const url = folder.createFile(blob).getUrl();
-  const v = sh.getDataRange().getValues();
-  for (let r = 1; r < v.length; r++) {
-    if (v[r][1] === p.ref) { sh.getRange(r + 1, 3).setValue('إيصال مرفوع'); sh.getRange(r + 1, 17).setValue(url); }
-  }
+  const url = folder_().createFile(blob).getUrl();
+  sh.getRange('B:B').createTextFinder(p.ref).matchEntireCell(true).findAll().forEach(c => {
+    sh.getRange(c.getRow(), 3).setValue('إيصال مرفوع'); sh.getRange(c.getRow(), 17).setValue(url);
+  });
   return { ok: true };
 }
 

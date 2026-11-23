@@ -370,7 +370,7 @@ function pick(inp) {
 }
 async function send4() {
   if (!fileData) return $('err4').textContent = 'ارفعوا إيصال التحويل.';
-  $('b4').disabled = true; $('b4').textContent = 'جاري الرفع…';
+  $('b4').disabled = true; $('b4').textContent = 'جاري الرفع… لا تقفلون الصفحة';
   try {
     if (!ref) await (regP || (regP = register(lastPayload)));
     const res = await post({ action: 'receipt', ref, file: fileData });
@@ -381,6 +381,8 @@ async function send4() {
   } finally { $('b4').disabled = false; $('b4').textContent = 'تأكيد التسجيل'; }
 }
 addKid(); go(1);
+// إيقاظ الخادم مبكراً حتى يكون الحجز والرفع أسرع
+post({ action: 'ping' }).catch(() => {});
 </script>
 </body>
 </html>
