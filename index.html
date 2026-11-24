@@ -148,6 +148,7 @@ footer{text-align:center;color:#a99f93;font-size:12.5px;margin-top:20px}
     <div class="free">
       <h3>مجاناً لكل العائلة 🎈</h3>
       <ul><li>🏃 الماراثون</li><li>🛝 الزحليقة والرمل</li><li>⚽ ألعاب ومسابقات حركية</li><li>☕ ضيافة الأمهات</li></ul>
+      <button class="btn o" type="button" onclick="go(6)">بنحضر الفعاليات المجانية 🎈</button>
     </div>
     <div class="moms">💛 حضور الأهل مو شرط، لكن نتمنى نشوفكم! تعالوا شوفوا طفلكم وهو يطبخ، وتعرّفوا على فريق سمة. وإذا عندكم أطفال بأعمار ثانية، جيبوهم يلعبون معنا في الألعاب المجانية.</div>
     <div class="coupon">عندكم كوبون من عربة سمة؟ 🎟️<br>استخدموا الكود <b>SIMAH50</b> وخذوا خصم ٥٠٪ على إجمالي التسجيل</div>
@@ -230,6 +231,39 @@ footer{text-align:center;color:#a99f93;font-size:12.5px;margin-top:20px}
       <p class="sub">وصلنا تسجيلكم وإيصال التحويل، وبيتواصل معكم فريق سمة لتأكيد الحجز.</p>
       <div>رقمكم المرجعي</div>
       <div class="ref" id="refOut"></div>
+      <p class="sub">نشوفكم الخميس الساعة ١٠ صباحاً 💛</p>
+    </div>
+  </section>
+
+  <!-- 6 FREE ATTENDANCE -->
+  <section class="card step hide" data-s="6">
+    <h2>تسجيل حضور الفعاليات المجانية 🎈</h2>
+    <p class="sub">مجاني وبدون دفع. سجّلوا عشان نجهّز الألعاب والضيافة على قدكم.</p>
+    <label>اسم ولي الأمر</label>
+    <input type="text" id="fname" autocomplete="name">
+    <label>رقم الجوال</label>
+    <input type="tel" id="fphone" placeholder="05xxxxxxxx" inputmode="numeric" autocomplete="tel">
+    <label>كم شخص بالغ بيحضر؟</label>
+    <div class="chips" id="fAdults"></div>
+    <label>كم طفل بيحضر؟</label>
+    <div class="chips" id="fKids"></div>
+    <label>أعمار الأطفال <small>(اختياري)</small></label>
+    <input type="text" id="fages" placeholder="مثال: ٤ و ٧ سنوات">
+    <label>نوافق على تصوير الأطفال للنشر في حسابات سمة</label>
+    <div class="chips">
+      <label><input type="radio" name="fphoto" value="نعم"><span>نعم</span></label>
+      <label><input type="radio" name="fphoto" value="لا"><span>لا</span></label>
+    </div>
+    <div class="err" id="err6"></div>
+    <button class="btn" id="b6" onclick="sendFree()">تأكيد الحضور</button>
+    <button class="back" onclick="go(1)">→ رجوع</button>
+  </section>
+
+  <!-- 7 FREE THANKS -->
+  <section class="card step hide" data-s="7">
+    <div class="done">
+      <div class="big">🎈</div>
+      <h2>وصلنا تسجيلكم!</h2>
       <p class="sub">نشوفكم الخميس الساعة ١٠ صباحاً 💛</p>
     </div>
   </section>
@@ -379,6 +413,27 @@ async function send4() {
   } catch (e) {
     $('err4').textContent = 'تعذّر رفع الإيصال، حاولوا مرة ثانية.';
   } finally { $('b4').disabled = false; $('b4').textContent = 'تأكيد التسجيل'; }
+}
+/* ---- free attendance ---- */
+[['fAdults','fad',[1,2,3,4]],['fKids','fkd',[0,1,2,3,4,5]]].forEach(([id,n,vs]) => {
+  $(id).innerHTML = vs.map(v => `<label><input type="radio" name="${n}" value="${v}"><span>${AR(v)}${v === vs[vs.length-1] ? '+' : ''}</span></label>`).join('');
+});
+async function sendFree() {
+  $('err6').textContent = '';
+  if (!$('fname').value.trim()) return $('err6').textContent = 'اكتبوا اسم ولي الأمر.';
+  if (!phoneOk($('fphone').value)) return $('err6').textContent = 'رقم الجوال يبدأ بـ05 ومكوّن من ١٠ أرقام.';
+  if (!radio('fad')) return $('err6').textContent = 'اختاروا عدد البالغين.';
+  if (!radio('fkd')) return $('err6').textContent = 'اختاروا عدد الأطفال.';
+  if (!radio('fphoto')) return $('err6').textContent = 'اختاروا موافقة التصوير.';
+  $('b6').disabled = true; $('b6').textContent = 'جاري التسجيل…';
+  try {
+    let res = null;
+    for (let i = 0; i < 3 && !(res && res.ok); i++) { try { res = await post({ action: 'free', parent: $('fname').value.trim(), phone: normPhone($('fphone').value), adults: radio('fad'), kids: radio('fkd'), ages: $('fages').value.trim(), photo: radio('fphoto') }); } catch (e) {} }
+    if (!res || !res.ok) throw new Error('free');
+    go(7);
+  } catch (e) {
+    $('err6').textContent = 'تعذّر التسجيل، حاولوا مرة ثانية.';
+  } finally { $('b6').disabled = false; $('b6').textContent = 'تأكيد الحضور'; }
 }
 addKid(); go(1);
 // إيقاظ الخادم مبكراً حتى يكون الحجز والرفع أسرع
