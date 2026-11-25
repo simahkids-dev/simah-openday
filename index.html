@@ -318,9 +318,9 @@ function addKid() {
   $('kids').appendChild(d); applySeats(); calc();
 }
 /* ---- مقاعد الورش (٣٠ لكل ورشة) ---- */
-let SEATS = null;
+let SEATS = null, CLOSED = {};
 async function loadSeats() {
-  try { const r = await fetch(CONFIG.SCRIPT_URL + '?action=seats').then(r => r.json()); if (r.ok) { SEATS = r.left; applySeats(); } } catch (e) {}
+  try { const r = await fetch(CONFIG.SCRIPT_URL + '?action=seats').then(r => r.json()); if (r.ok) { SEATS = r.left; CLOSED = r.closed || {}; applySeats(); } } catch (e) {}
   return SEATS;
 }
 function applySeats() {
@@ -330,19 +330,23 @@ function applySeats() {
     [['.lp', '.wp', pz], ['.lh', '.wh', hc]].forEach(([l, i, off]) => {
       const lb = c.querySelector(l), inp = c.querySelector(i);
       lb.classList.toggle('off', off); if (off) inp.checked = false;
-      if (off && !lb.querySelector('.full-tag')) lb.querySelector('span').insertAdjacentHTML('beforeend', '<em class="full-tag">(اكتملت)</em>');
+      if (off && !lb.querySelector('.full-tag')) lb.querySelector('span').insertAdjacentHTML('beforeend', '<em class="full-tag">(تم الاكتفاء)</em>');
     });
   });
   const m = $('fullMsg');
-  if (pz && hc) { m.textContent = 'اكتمل التسجيل في الورش 💛 تقدرون تسجّلون حضوركم في الفعاليات المجانية.'; m.classList.remove('hide'); $('goReg').classList.add('hide'); }
-  else if (pz || hc) { m.textContent = (pz ? 'اكتملت ورشة البيتزا 🍕' : 'اكتملت ورشة الهوت شوكلت ☕') + '، والتسجيل متاح في ' + (pz ? 'ورشة الهوت شوكلت' : 'ورشة البيتزا') + '.'; m.classList.remove('hide'); $('goReg').classList.remove('hide'); }
+  if (pz && hc) { m.textContent = CLOSED.free ? 'تم الاكتفاء بالتسجيل 💛 شكراً لاهتمامكم، ونشوفكم في فعالياتنا الجاية.' : 'تم الاكتفاء بالتسجيل في الورش 💛 والتسجيل متاح في الفعاليات المجانية والألعاب الخارجية.'; m.classList.remove('hide'); $('goReg').classList.add('hide'); }
+  else if (pz || hc) { m.textContent = (pz ? 'تم الاكتفاء بالتسجيل في ورشة البيتزا 🍕' : 'تم الاكتفاء بالتسجيل في ورشة الهوت شوكلت ☕') + '، والتسجيل متاح في ' + (pz ? 'ورشة الهوت شوكلت' : 'ورشة البيتزا') + '.'; m.classList.remove('hide'); $('goReg').classList.remove('hide'); }
   else { m.classList.add('hide'); $('goReg').classList.remove('hide'); }
+  const fb = document.querySelector('.free .btn');
+  if (fb) { fb.disabled = !!CLOSED.free; fb.textContent = CLOSED.free ? 'تم الاكتفاء بالتسجيل في الفعاليات المجانية' : 'بنحضر الفعاليات المجانية 🎈'; }
+  if (CLOSED.free && pz && hc) m.classList.remove('hide');
+  else if (CLOSED.free && !pz && !hc) { m.textContent = 'تم الاكتفاء بالتسجيل في الفعاليات المجانية، والتسجيل متاح في الورش.'; m.classList.remove('hide'); }
 }
 function seatErr(ks) {
   if (!SEATS) return '';
   const p = ks.filter(k => k.pizza).length, h = ks.filter(k => k.hot).length;
-  if (p > SEATS.pizza) return SEATS.pizza <= 0 ? 'اكتملت ورشة البيتزا.' : `باقي ${AR(SEATS.pizza)} مقاعد بس في ورشة البيتزا.`;
-  if (h > SEATS.hot) return SEATS.hot <= 0 ? 'اكتملت ورشة الهوت شوكلت.' : `باقي ${AR(SEATS.hot)} مقاعد بس في ورشة الهوت شوكلت.`;
+  if (p > SEATS.pizza) return SEATS.pizza <= 0 ? 'تم الاكتفاء بالتسجيل في ورشة البيتزا.' : `باقي ${AR(SEATS.pizza)} مقاعد بس في ورشة البيتزا.`;
+  if (h > SEATS.hot) return SEATS.hot <= 0 ? 'تم الاكتفاء بالتسجيل في ورشة الهوت شوكلت.' : `باقي ${AR(SEATS.hot)} مقاعد بس في ورشة الهوت شوكلت.`;
   return '';
 }
 function kids() {
@@ -481,6 +485,7 @@ async function sendFree() {
   try {
     let res = null;
     for (let i = 0; i < 3 && !(res && res.ok); i++) { try { res = await post({ action: 'free', parent: $('fname').value.trim(), phone: normPhone($('fphone').value), adults: radio('fad'), kids: radio('fkd'), ages: $('fages').value.trim(), photo: radio('fphoto') }); } catch (e) {} }
+    if (res && res.error === 'closed') { CLOSED.free = true; applySeats(); return $('err6').textContent = 'تم الاكتفاء بالتسجيل في الفعاليات المجانية.'; }
     if (!res || !res.ok) throw new Error('free');
     go(7);
   } catch (e) {
